@@ -1,0 +1,30 @@
+formatter: "markdown"
+
+sort:
+  enabled: true
+  by: required
+
+content: |-
+
+  {{ .Header }}
+
+  ## Example
+
+  ```hcl
+  {{ include "examples/simple/main.tf" }}
+  ```
+  <!-- markdownlint-disable -->
+
+  {{ .Modules }}
+
+  {{ .Providers }}
+
+  {{ .Requirements }}
+
+  {{ .Resources }}
+
+  {{ .Inputs }}
+
+  {{ .Outputs }}
+
+  {{ .Footer }}

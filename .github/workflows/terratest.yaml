@@ -1,0 +1,100 @@
+name: Integration Tests
+on:
+  push:
+    branches:
+      - '**'
+      - '!main'
+jobs:
+  get-changes:
+    if: ${{ true }} # Set this to false to disable tests.
+    name: Get Changed Modules
+    runs-on: ubuntu-latest
+    outputs:
+      changed-modules: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v1
+      - name: Get changed modules
+        id: changed-modules
+        uses: tj-actions/changed-files@v23.1
+        with:
+          files: modules/
+          dir_names: true
+      - name: Set Matrix
+        id: set-matrix
+        run: |
+          export _changed="${{ steps.changed-modules.outputs.all_changed_files }}"
+          echo "_changed=${_changed}"
+          _matrix="{\"changed-modules\":[$(printf "\"%s\"," ${_changed[@]}|sed 's/,$//')]}"
+          # Filter out subdirectories
+          export _matrix=$(echo "${_matrix}" | jq -c '."changed-modules" | map(select(test("^modules\/[a-z0-9-]*$"))) | unique | {"changed-modules":.}')
+          echo "${_matrix}" | jq
+          echo "::set-output name=matrix::${_matrix}"
+  run-tests:
+    needs: [get-changes]
+    if: toJSON(fromJSON(needs.get-changes.outputs.changed-modules).changed-modules) != '[]'
+    name: Run Terratest Tests
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    strategy:
+      matrix:
+        changed-modules: ${{ fromJSON(needs.get-changes.outputs.changed-modules).changed-modules }}
+        terraform-versions: ["latest"] # Add versions here to test against them.
+    steps:
+      - uses: actions/checkout@v1
+      - name: Check for Tests
+        id: check-tests
+        run: |
+          echo "${{ matrix.changed-modules }}"
+          if [[ -d "${{ matrix.changed-modules }}/test" ]]; then
+            echo "::set-output name=tests-exist::true"
+          else
+            echo "No tests detected."
+            echo "::set-output name=tests-exist::false"
+          fi
+      - uses: actions/setup-go@v1
+        if: steps.check-tests.outputs.tests-exist == 'true'
+        with:
+          go-version: 1.13
+      - name: Install tfenv
+        uses: rhythmictech/actions-setup-tfenv@v0.0.3
+        if: steps.check-tests.outputs.tests-exist == 'true'
+      - name: Setup Terraform.
+        if: steps.check-tests.outputs.tests-exist == 'true'
+        run: |
+          if [[ ${{matrix.terraform-versions}} == 'latest' ]]; then
+            _latest=$(tfenv  list-remote | head -n 1)
+            tfenv install $_latest
+            tfenv use $_latest
+          else
+            tfenv install ${{matrix.terraform-versions}}
+            tfenv use ${{matrix.terraform-versions}}
+          fi
+      - name: Run Go Tests
+        if: steps.check-tests.outputs.tests-exist == 'true'
+        working-directory: ${{ matrix.changed-modules }}/test
+        run: go test -v -tags integration
+  success:
+    needs: [run-tests]
+    name: Check Success
+    runs-on: ubuntu-latest
+    if: always()
+    steps:
+      - id: report
+        name: Report
+        run: |
+          case "${{ toJSON(needs.run-tests.result) }}" in
+            "success")
+              echo "Success: All tests passed."
+              exit 0
+              ;;
+            "skipped")
+              echo "Warning: Tests skipped."
+              exit 0
+              ;;
+            *)
+              echo "Error: Test status was $_status."
+              exit 1
+              ;;
+          esac
