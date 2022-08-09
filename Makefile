@@ -1,7 +1,7 @@
 .SHELL := /usr/bin/bash
 
 MODULES_DIR=modules
-MODULENAME_PATTERN=^[a-z-]*$$
+MODULENAME_PATTERN=^[0-9a-z-]*$$
 
 ifeq (module,$(firstword $(MAKECMDGOALS)))
   RUN_ARGS := $(wordlist 2,$(words $(MAKECMDGOALS)),$(MAKECMDGOALS))
