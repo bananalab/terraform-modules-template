@@ -8,7 +8,7 @@
     }
   },
   "features": {
-    "ghcr.io/devcontainers/features/aws-cli:1": {},
+    "ghcr.io/bananalab/devcontainer-features/aws-cli:latest": {},
     "ghcr.io/bananalab/devcontainer-features/checkov:latest": {},
     "ghcr.io/bananalab/devcontainer-features/direnv:latest": {},
     "ghcr.io/bananalab/devcontainer-features/pre-commit:latest": {},
