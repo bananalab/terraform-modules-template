@@ -1,4 +1,4 @@
-.SHELL := /usr/bin/bash
+SHELL := $(shell which bash)
 
 MODULES_DIR=modules
 MODULENAME_PATTERN=^[0-9a-z-]*$$
