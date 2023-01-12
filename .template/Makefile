@@ -1,3 +1,4 @@
+SHELL := $(shell which bash)
 .PHONY: test
 
 test:
