@@ -1,0 +1,13 @@
+
+#!/bin/bash -uex
+docker plugin install rexray/s3fs:latest --grant-all-permissions \
+    # TODO: Use IAM role for S3fs
+    S3FS_ACCESSKEY=xxxxx \
+    S3FS_SECRETKEY=xxxxx \
+    S3FS_OPTIONS="allow_other,umask=000" \
+    LIBSTORAGE_INTEGRATION_VOLUME_OPERATIONS_MOUNT_ROOTPATH=/
+cat <<'EOF' >> /etc/ecs/ecs.config
+    ECS_CLUSTER=${name}
+    ECS_ENABLE_TASK_IAM_ROLE=true
+EOF
+echo 'Done.'

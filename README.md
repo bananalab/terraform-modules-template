@@ -6,10 +6,9 @@ This repository contains Terraform Modules for use in configurations.
 
 ### Development Environment
 
-You will need a number of tools in order to develop modules.  You can install
-all required tools by running `brew bundle` in the root of the project.  Once
-the tools are installed run `direnv allow` to enable environment management for
-the project.
+This project uses [devcontainers](https://containers.dev/) to provide a
+consistent developer experience. All required tools and settings are defined
+in the devcontainer config file `.devcontainer/devcontainer.json`.
 
 ### Create a new module
 

@@ -1,0 +1,30 @@
+[
+  {
+    "cpu": 0,
+    "environment": [],
+    "essential": true,
+    "image": "nginx",
+    "logConfiguration": {
+      "logDriver": "awslogs",
+      "options": {
+        "awslogs-create-group": "true",
+        "awslogs-group": "/ecs/nginx",
+        "awslogs-region": "us-west-1",
+        "awslogs-stream-prefix": "ecs"
+      }
+    },
+    "memory": 1024,
+    "mountPoints": [],
+    "name": "nginx",
+    "portMappings": [
+      {
+        "appProtocol": "http",
+        "containerPort": 80,
+        "hostPort": 80,
+        "name": "nginx_web-80-tcp",
+        "protocol": "tcp"
+      }
+    ],
+    "volumesFrom": []
+  }
+]

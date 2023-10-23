@@ -1,14 +1,28 @@
-module "this" {
-  source             = "../../"
-  cidr               = "10.0.0.0/16"
-  availability_zones = ["us-west-1b", "us-west-1c"]
-  public_subnets     = ["10.0.0.0/20", "10.0.16.0/20"]
-  private_subnets    = ["10.0.32.0/20", "10.0.48.0/20"]
+provider "aws" {
+  default_tags {
+    tags = {
+      Terraformed = true
+      Environment = "test"
+      Name        = "vpc-module-test"
+    }
+  }
 }
 
-output "result" {
-  description = <<-EOT
-    The result of the module.
-  EOT
-  value       = module.this.result
+data "aws_availability_zones" "available" {
+  state = "available"
+}
+
+locals {
+  availability_zones = slice(data.aws_availability_zones.available.names, 0, 2)
+}
+
+module "this" {
+  source                 = "../../"
+  name                   = "example"
+  availability_zones     = local.availability_zones
+  vpc_ip_address         = "10.11.0.0"
+  vpc_netmask_length     = 16
+  subnets_netmask_length = 20
+  create_public_subnets  = true
+  create_nat_gateways    = true
 }
