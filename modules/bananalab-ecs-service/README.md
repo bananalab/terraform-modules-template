@@ -1,4 +1,4 @@
-# empire-ecs-service
+# bananalab-ecs-service
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
