@@ -1,4 +1,4 @@
-# empire-stack
+# bananalab-platform
 
 <!-- BEGINNING OF PRE-COMMIT-TERRAFORM DOCS HOOK -->
 
